@@ -1,62 +1,70 @@
-const HtmlWebPackPlugin       = require('html-webpack-plugin'); 
-const MiniCssExtractPlugin    = require('mini-css-extract-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+const htmlWebPackPlugin    = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin           = require("copy-webpack-plugin");
 
 module.exports = {
     mode: 'development',
-    optimization: {
-        minimizer: [ new OptimizeCssAssetsPlugin() ]
+
+    output: {
+        clean: true
     },
     module: {
         rules: [
             {
-                test: /\.css$/,
-                exclude: /styles\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            },
-            {
-                test: /styles\.css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader'
-                ]
-            },
-            {
-                test: /\.html$/,
+                test: /\.html$/i,
                 use: [
                     {
                         loader: 'html-loader',
-                        options: { minimize: false }
+                        options: {
+                            sources: false
+                        }
                     }
                 ]
             },
             {
-                test: /\.(png|svg|jpg|gif)$/,
+                test: /\.css$/i,
+                exclude: /styles.css$/,
                 use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            esModule: false,
-                            name: 'assets/[name].[ext]'
-                        }
-                    }
+                        'style-loader', 'css-loader'
                 ]
+            },
+            {
+                test: /styles.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader, 'css-loader'
+                ]
+            },
+            {
+                test:  /\.(png|jpe?g|gif)$/i,
+                loader: 'file-loader'
             }
+            
         ]
     },
+
+    optimization: {
+
+    },
+
     plugins: [
-        new HtmlWebPackPlugin({
+        new htmlWebPackPlugin({
+            title: 'Mi WevPackApp',
             template: './src/index.html',
             filename: './index.html'
         }),
+
         new MiniCssExtractPlugin({
-            filename: '[name].css',
+            filename: 'styles.[fullhash].css',
             ignoreOrder: false
-        })
+        }),
+
+        new CopyPlugin({ 
+                patterns: [
+                    {from: 'src/assets/', to: 'assets/'}
+                ]
+        }),
     ]
 
-}
 
+}
